@@ -8,6 +8,7 @@ public class GroupedUnaryExpressionOperators
 {
     public static IDictionary AnalyzeAst(Ast ast)
     {
+        // 统计一元运算符表达式各个种类的数量和各自的比例
         // Initialize Dictionary with common array counts initialized to 0.
         Dictionary<String, Double> astGroupedUnaryExpressionOperatorsDictionary = new Dictionary<String, Double>(StringComparer.OrdinalIgnoreCase);
         

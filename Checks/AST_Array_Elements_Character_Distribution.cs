@@ -8,7 +8,7 @@ public class ArrayElementMetrics
 {
     public static IDictionary AnalyzeAst(Ast ast)
     {
-        // 返回 “数组类AST” 中
+        // 返回 “数组类AST” items(选取每个数组类AST结点的Extent.Text值)中关于字符特征的统计
         // Build string list of all AST object values that will be later sent to StringMetricCalculator.
         List<String> stringList = new List<String>();
 

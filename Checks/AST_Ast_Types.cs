@@ -9,6 +9,7 @@ public class GroupedAstTypes
     //public static List<KeyValuePair<String, Double>> AnalyzeAst(Ast ast)
     public static IDictionary AnalyzeAst(Ast ast)
     {
+        // 返回各类AST类型数量与各自所占比例
         // Initialize Dictionary with all known AST object types initialized to 0.
         Dictionary<String, Double> astTypeDictionary = new Dictionary<String, Double>(StringComparer.OrdinalIgnoreCase);
         

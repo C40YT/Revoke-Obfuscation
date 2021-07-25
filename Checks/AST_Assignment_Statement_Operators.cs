@@ -8,6 +8,7 @@ public class GroupedAssignmentStatements
 {
     public static IDictionary AnalyzeAst(Ast ast)
     {
+        // 返回 “assignment类AST” 中各类赋值操作的数量 包括各类数量与各自所占比例
         // Initialize Dictionary with common array counts initialized to 0.
         Dictionary<String, Double> astGroupedAssignmentStatementsDictionary = new Dictionary<String, Double>(StringComparer.OrdinalIgnoreCase);
         
