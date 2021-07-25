@@ -11,12 +11,12 @@ public class GroupedAssignmentStatements
         // Initialize Dictionary with common array counts initialized to 0.
         Dictionary<String, Double> astGroupedAssignmentStatementsDictionary = new Dictionary<String, Double>(StringComparer.OrdinalIgnoreCase);
         
-        astGroupedAssignmentStatementsDictionary["Equals"] = 0;
-        astGroupedAssignmentStatementsDictionary["PlusEquals"] = 0;
-        astGroupedAssignmentStatementsDictionary["MinusEquals"] = 0;
-        astGroupedAssignmentStatementsDictionary["MultiplyEquals"] = 0;
-        astGroupedAssignmentStatementsDictionary["DivideEquals"] = 0;
-        astGroupedAssignmentStatementsDictionary["RemainderEquals"] = 0;
+        astGroupedAssignmentStatementsDictionary["Equals"] = 0;             // =
+        astGroupedAssignmentStatementsDictionary["PlusEquals"] = 0;         // +=
+        astGroupedAssignmentStatementsDictionary["MinusEquals"] = 0;        // -=
+        astGroupedAssignmentStatementsDictionary["MultiplyEquals"] = 0;     // *=
+        astGroupedAssignmentStatementsDictionary["DivideEquals"] = 0;       // /=
+        astGroupedAssignmentStatementsDictionary["RemainderEquals"] = 0;    // %=
         astGroupedAssignmentStatementsDictionary["UNKNOWN"] = 0;
         
         // Return all targeted AST objects by Count and Percent across the entire input AST object.
