@@ -8,6 +8,7 @@ public class ArrayElementMetrics
 {
     public static IDictionary AnalyzeAst(Ast ast)
     {
+        // 返回 “数组类AST” 中
         // Build string list of all AST object values that will be later sent to StringMetricCalculator.
         List<String> stringList = new List<String>();
 

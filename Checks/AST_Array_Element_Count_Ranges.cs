@@ -8,6 +8,7 @@ public class GroupedArrayElementRangeCounts
 {
     public static IDictionary AnalyzeAst(Ast ast)
     {
+        // 返回 “数组类AST” 中元素个数的分布 包括数组数量范围的统计值与各个范围各自比例
         // Initialize Dictionary with common array count ranges initialized to 0.
         Dictionary<String, Double> astArrayElementCountsDictionary = new Dictionary<String, Double>(StringComparer.OrdinalIgnoreCase);
         

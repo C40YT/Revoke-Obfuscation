@@ -8,6 +8,13 @@ using System.Text;
 public delegate string AstExtractValue(Ast ast);
 public static class RevokeObfuscationHelpers
 {
+    // ast => 输入的ast树
+    // targetType => 需要统计的目标ast种类
+    // workingResult => 用于存储统计结果的字典
+    // checkName => 用于标识的头部字符串，被添加到输出统计结果的头部
+    // extractValue => 由符合类别要求的ast节点计算得到workingResult中对应的key，用于增加ast节点对应key的value
+    // 函数功能: 对符合type要求的ast节点通过extractValue计算得到统计类别，增加保存在workingResult中相应的类别的值
+    // 最后将workingResult输出到包含“所有”统计值字典中, 以checkName_key_Count和checkName_key_Percent的形式保存
     public static IDictionary AstValueGrouper(Ast ast, Type targetType, Dictionary<string, double> workingResult, string checkName, AstExtractValue extractValue)
     {
         // Initialize Dictionary to store final results for this check since we cannot modify a Dictionary over which we are iterating.
@@ -57,7 +64,8 @@ public static class RevokeObfuscationHelpers
         return new SortedDictionary<string, double>(finalResult);
     }
     
-    
+    // stringList => 用于统计计算的items(为特定astType的text列表)
+    // checkName => 用于标识的头部字符串，被添加到输出统计结果的头部 
     public static IDictionary StringMetricCalculator(List<string> stringList, string checkName)
     {
         // Initialize Dictionary to store final results for this check since we cannot modify a Dictionary over which we are iterating.
@@ -67,24 +75,30 @@ public static class RevokeObfuscationHelpers
         // Dictionary is a clone of initializedCharDict so all possible characters are already initialized to zero so attribute columns will be consistent for any evaluated script or command.
         Dictionary<string, double> workingResult = new Dictionary<string, double>(initializedCharDict);
         double totalCharacters = 0;
-        double totalSpecialCharacters = 0;
+        double totalSpecialCharacters = 0;   // 特殊字符(非'\t', '\n', ' ', [0-9a-zA-Z])
         
+        // ========================= 用于记录字符串长度， 密度， 熵， 大写字母比例的 List 和 Dict ===============================
+
+        // items的字符串长度统计
         // Initialize Dictionary and List of integers to store the length of each string in stringList for later calculations (average/maximum/minimum/median/mode/range).
         List<double> stringLengthList = new List<double>();
         Dictionary<double, int> stringLengthDict = new Dictionary<double, int>();
         
+        // items的密度统计: 非空格字符数/字符总数
         // Initialize Dictionary and List of doubles and counter to store the density of each string in stringList for later calculations (average/maximum/minimum/median/mode/range).
         List<double> stringDensityList = new List<double>();
         Dictionary<double, int> stringDensityDict = new Dictionary<double, int>();
         double curStringWhitespaceTabCount = 0;
         double totalDensityValues = 0;
         
+        // 字符熵的统计 example: entropy = sum(-plgp,...)
         // Initialize Dictionary and List of doubles and counter to store the entropy of each string in stringList for later calculations (average/maximum/minimum/median/mode/range).
         List<double> stringEntropyList = new List<double>();
         Dictionary<double, int> stringEntropyDict = new Dictionary<double, int>();
         Dictionary<char, int> curStringCharDict = new Dictionary<char, int>();
         double totalEntropyValues = 0;
         
+        // 字符中 (字母数 [a-zA-Z]) 和 (大写字母数 [A-Z]) 统计
         // Initialize Dictionary and List of doubles and counter to store the percentage of upper-case alpha characters among all alpha characters in each string in stringList for later calculations (average/maximum/minimum/median/mode/range).
         List<double> stringUpperAlphaPercentList = new List<double>();
         Dictionary<double, int> stringUpperAlphaPercentDict = new Dictionary<double, int>();
@@ -95,6 +109,7 @@ public static class RevokeObfuscationHelpers
         // Compute the counts for each specified item.
         foreach(String curString in stringList)
         {
+            // 将字符串长度加入到全局统计中
             // Add curString lengths for later calculations (average/maximum/minimum/median/mode/range).
             stringLengthList.Add(curString.Length);
             
@@ -118,6 +133,7 @@ public static class RevokeObfuscationHelpers
             curStringAlphaCharCount = 0;
             curStringUpperAlphaCharCount = 0;
             
+            // 统计 item字符串中 字符串长度，空格数，字母数，大写字母数
             foreach(Char curChar in curString.ToCharArray())
             {
                 // Convert current character to a string that is the UTF8 representation of the character.
@@ -166,6 +182,7 @@ public static class RevokeObfuscationHelpers
                 workingResult[resultKey]++;
             }
             
+            // 通过空格数和字符长度计算出该item的字符密度，添加到全局统计中
             // Add curString density to list for later calculations (average/maximum/minimum/median/mode/range).
             double curStringDensity = 0;
             if(curString.Length > 0)
@@ -186,6 +203,7 @@ public static class RevokeObfuscationHelpers
                 stringDensityDict[curStringDensity] = 1;
             }
             
+            // 通过item的字符分布和字符串长度计算得到item的熵，添加到全局统计中
             // Calculate entropy for curString.
             double curStringEntropy = GetEntropy(curStringCharDict, curString.Length);
 
@@ -203,6 +221,7 @@ public static class RevokeObfuscationHelpers
                 stringEntropyDict[curStringEntropy] = 1;
             }
             
+            // 通过item的字母数量和大写字母数量计算得到大写字母的比例，添加到全局统计中
             // Add curString upper-alpha character percentage (only if there are alpha characters in curString) to list for later calculations (average/maximum/minimum/median/mode/range).
             if(curStringAlphaCharCount > 0)
             {
@@ -223,6 +242,7 @@ public static class RevokeObfuscationHelpers
             }
         }
         
+        // 统计所有stringList中的字符数量分布和各自的占比
         foreach(String workingResultValue in workingResult.Keys)
         {
             // Add Count and Percent to final Dictionary.
@@ -238,6 +258,7 @@ public static class RevokeObfuscationHelpers
             }
         }
         
+        // 统计所有stringList中的特殊字符数量和相对所有字符的占比
         // Add Count and Percent for special characters to final Dictionary.
         if(totalCharacters == 0)
         {
@@ -250,23 +271,27 @@ public static class RevokeObfuscationHelpers
             finalResult[checkName + "_CharacterDistribution_SpecialCharacterOnly_Percent"] = ((double) totalSpecialCharacters) * 100 / totalCharacters;
         }
         
+        // 所有stringList的item数量
         // Add total count of all input strings to final Dictionary.
         finalResult[checkName + "_Count"] = stringLengthList.Count;
             
+        // 所有stringList的字符总数
         // Add cumulative length of all input strings to final Dictionary.
         finalResult[checkName + "_Length_Total"] = totalCharacters;
         
+        // 对stringList中各个item对应的长度，密度，熵，大写字母比例 进行 平均值，最大值，最小值，中位数，众数，范围
         // Calculate length, density and entropy values and add to finalResult.
         finalResult = GetAvgMaxMinMedModRan(finalResult, stringLengthList, totalCharacters, stringLengthDict, checkName + "_Length");
         finalResult = GetAvgMaxMinMedModRan(finalResult, stringDensityList, totalDensityValues, stringDensityDict, checkName + "_Density");
         finalResult = GetAvgMaxMinMedModRan(finalResult, stringEntropyList, totalEntropyValues, stringEntropyDict, checkName + "_Entropy");
         finalResult = GetAvgMaxMinMedModRan(finalResult, stringUpperAlphaPercentList, totalUpperAlphaPercentValues, stringUpperAlphaPercentDict, checkName + "_UpperAlphaPercent");
         
+        // 最后以"checkName_discription_count" "checkName_discription_percent" "..._Length_Average" "..._Length_Maximun" ... 返回统计结果
         // Return final result after sorting as a SortedDictionary.
         return new SortedDictionary<string, double>(finalResult);
     }
     
-    
+    // 平均值，最大值，最小值，中位数，众数，范围的统计
     public static Dictionary<string, double> GetAvgMaxMinMedModRan(Dictionary<string, double> finalResult, List<double> inputList, double totalInputs, Dictionary<double, int> inputDictForMode, string checkName)
     {
         // Calculate the average/maximum/minimum/median/mode/range of input values.
@@ -300,7 +325,7 @@ public static class RevokeObfuscationHelpers
         return finalResult;
     }
     
-    
+    // 计算字符集合的熵 entropy = sum(-plgp,...)
     public static double GetEntropy(Dictionary<char, int> charDict, int totalChars)
     {
         // Calculate the entropy of input values.
@@ -320,7 +345,7 @@ public static class RevokeObfuscationHelpers
         return entropy;
     }
     
-    
+    // 众数的统计
     public static double GetMode(Dictionary<double, int> inputDictionary)
     {
         // Calculate the mode of input values.
@@ -340,7 +365,7 @@ public static class RevokeObfuscationHelpers
         return modeValue;
     }
     
-    
+    // initializedCharDict 是对所有可能的字符集合(包括可见字符和特殊字符)的数量统计字典，在每次调用StringMetricCalculator都会拷贝一份给函数用作记录
     public static Dictionary<string, double> initializedCharDict = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase)
     {
         // Initialize Dictionary with all possible character key values included in the character frequency analysis in StringMetricCalculator function.
@@ -505,7 +530,7 @@ public static class RevokeObfuscationHelpers
         {"UNKNOWN_UTF", 0},
     };
 
-    
+    // 返回是否是特殊字符
     public static bool IsSpecialChar(char charToCheck)
     {
         // Return true if input charToCheck is a special character. Otherwise return false.
@@ -581,7 +606,7 @@ public static class RevokeObfuscationHelpers
         }
     }
     
-    
+    // 返回字符是否是[a-zA-Z]
     public static bool IsAlphaChar(char charToCheck)
     {
         // Return true if input charToCheck is an alpha character [a-zA-Z]. Otherwise return false.
@@ -644,7 +669,7 @@ public static class RevokeObfuscationHelpers
         }
     }
     
-    
+    // 返回字符是否是[A-Z]
     public static bool IsUpperAlphaChar(char charToCheck)
     {
         // Return true if input charToCheck is an upper-case alpha character [A-Z]. Otherwise return false.
@@ -681,7 +706,7 @@ public static class RevokeObfuscationHelpers
         }
     }
     
-    
+    // 将所有字符进行编码处理转化为可见的字符串
     public static String ConvertToEncodedChar(Char curChar)
     {
         // For efficiency we will avoid computing UTF8 encoding values for the most commmon printable characters.
