@@ -8,6 +8,7 @@ public class IntegerAndDoubleMetrics
 {
     public static IDictionary AnalyzeAst(Ast ast)
     {
+        // 返回常数类AST如"0x10, 0x11, ... 17, 18"等中关于字符特征的统计
         // Build string list of all AST object values that will be later sent to StringMetricCalculator.
         List<string> stringList = new List<string>();
         

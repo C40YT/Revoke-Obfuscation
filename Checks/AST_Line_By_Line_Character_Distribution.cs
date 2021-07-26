@@ -9,6 +9,7 @@ public class LineByLineMetrics
 {
     public static IDictionary AnalyzeAst(Ast ast)
     {
+        // 对输入脚本中除了签名的部分进行逐行字符特征分析
         // Build string list of all AST object values that will be later sent to StringMetricCalculator.
         List<String> stringList = new List<String>();
         

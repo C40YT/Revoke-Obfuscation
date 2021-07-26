@@ -8,6 +8,8 @@ public class MemberMetrics
 {
     public static IDictionary AnalyzeAst(Ast ast)
     {
+        // 对成员表达式Ast类的成员进行字符分析
+        // 例如$sb.hahaha 成员为 hahaha，我们对hahaha等一众成员字符串进行字符分析
         // Build string list of all AST object values that will be later sent to StringMetricCalculator.
         List<string> stringList = new List<string>();
         

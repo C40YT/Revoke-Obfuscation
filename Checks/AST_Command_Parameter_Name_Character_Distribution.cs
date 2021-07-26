@@ -8,6 +8,7 @@ public class CommandParameterNameMetrics
 {
     public static IDictionary AnalyzeAst(Ast ast)
     {
+        // 返回命令项中参数(ie. ping 127.0.0.1 -n 100 中的 '-n' )中关于字符特征的统计
         // Build string list of all AST object values that will be later sent to StringMetricCalculator.
         List<string> stringList = new List<string>();
         

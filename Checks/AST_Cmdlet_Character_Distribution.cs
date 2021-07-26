@@ -8,6 +8,7 @@ public class CmdletMetrics
 {
     public static IDictionary AnalyzeAst(Ast ast)
     {
+        // 返回类型为CommandAst节点的命令项(选取每个CommandAst节点的CommandElements[0]值)中关于字符特征的统计
         // Build string list of all AST object values that will be later sent to StringMetricCalculator.
         List<String> stringList = new List<String>();
         

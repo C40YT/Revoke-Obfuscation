@@ -8,7 +8,7 @@ public class GroupedBinaryExpressionOperators
 {
     public static IDictionary AnalyzeAst(Ast ast)
     {
-        // BinaryExpressionAst类型中各类操作的数量与各自所占比例
+        // 统计二元运算符表达式中各类操作的数量与各自所占比例
         // Initialize Dictionary with common array counts initialized to 0.
         Dictionary<String, Double> astGroupedBinaryExpressionOperatorsDictionary = new Dictionary<String, Double>(StringComparer.OrdinalIgnoreCase);
         
