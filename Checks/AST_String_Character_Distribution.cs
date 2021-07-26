@@ -8,6 +8,8 @@ public class StringMetrics
 {
     public static IDictionary AnalyzeAst(Ast ast)
     {
+        // 对常量字符串Ast类的成员进行字符分析(不是BareWord)
+        // BareWord比如说$sb.hahaha的hahaha就是，其余的如"hahaha",'hahaha', @" a here string "@ 就不是Bareword
         // Build string list of all AST object values that will be later sent to StringMetricCalculator.
         List<String> stringList = new List<String>();
 

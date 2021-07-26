@@ -9,6 +9,7 @@ public class CommentMetrics
 {
     public static IDictionary AnalyzeAst(Ast ast)
     {
+        // 对注释进行字符统计分析
         // Build string list of all AST object values that will be later sent to StringMetricCalculator.
         List<String> stringList = new List<String>();
         

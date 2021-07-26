@@ -814,7 +814,7 @@ http://www.leeholmes.com/blog/
     }
 }
 
-
+# 通过在checks中定义的一系列方法，获取脚本的所有特征向量，以哈希表的形式返回
 function Get-RvoFeatureVector
 {
 <#
@@ -904,6 +904,7 @@ http://www.leeholmes.com/blog/
     # Parse $scriptContent into an AST object.
     $ast = [System.Management.Automation.Language.Parser]::ParseInput($scriptContent,[Ref] $null,[Ref] $null)
     
+    # 保存所有的特征向量到哈希表中
     # Create ordered hashtable to store all CheckScript results for current AST object.
     $allCheckScriptResults = [Ordered] @{}
 
@@ -914,6 +915,9 @@ http://www.leeholmes.com/blog/
         $checkScriptResult = $null
         try
         {
+            # 调用该check中定义的 AnalyzeAst
+            # $checkScript[0] => classname
+            # $checkScript[1] => AnalyzeAst
             $checkScriptResult = ([Type] $checkScript[0])::($checkScript[1]).Invoke($ast)
         }
         catch

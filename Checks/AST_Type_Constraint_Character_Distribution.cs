@@ -8,6 +8,8 @@ public class TypeConstraintMetrics
 {
     public static IDictionary AnalyzeAst(Ast ast)
     {
+        // 类型限制AST的字符统计
+        // 比如 [int] 表示限制类型为int类型， 则stringList包含如 int 等
         // Build string list of all AST object values that will be later sent to StringMetricCalculator.
         List<string> stringList = new List<string>();
         
