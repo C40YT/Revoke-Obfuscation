@@ -3,6 +3,7 @@ Accuracy / False Positive rate on training data = 0.9854 / 0.0035
 Accuracy / False Positive rate on test data = 0.9115 / 0.0549
 #>
 
+## ================= 对样本打标签的脚本 ====================
 ## Process all the files in a directory, opening them up in notepad. When notepad closes:
 ## Push ENTER if it is clean
 ## Type any letter and then ENTER if it is obfuscated
@@ -12,9 +13,13 @@ if(-not (Test-Path Clean)) { mkdir Clean }
 dir -af | % { notepad $_.Fullname | Out-Null; $d = Read-Host; if($d) { $_ | Move-Item -Destination Obfuscated } else { $_ | Move-Item -Destination Clean } }
 
 
+## 将InvokeCradleCrafter文件夹中的文件标记为混淆的(1)，并将 文件名 标签 保存到 “InvokeCradleCrafter-obfuscation-labeledData.csv”文件 中
 ## Process known obfuscated
 dir .\InvokeCradleCrafter\ -af -rec | % { [PSCustomObject] @{ Path = (Resolve-Path -Relative $_.FullName).Substring(2); Label = "1" } } | Export-Csv InvokeCradleCrafter-obfuscation-labeledData.csv -NoTypeInformation
 
+## ================= 通过线性回归进行混淆模型训练 ====================
+## 用于训练所需的CSV文件生成，该文件将包含训练样本的完整路径和与之对应的标签
+## A. 实践用的小样本作为训练集合
 ## Helpful intern version:
 ## Have Revoke-Obfuscation emit results for all items in the Clean or Obfuscated subdirectories. Requires an update to
 ## Revoke-Obfuscation ("-PassThru") to emit the objects directly rather than have them write to a CSV.
@@ -30,11 +35,12 @@ $analyzedCorpus = $labeledData.Keys | % {
 }
 $analyzedCorpus | Set-Content AnalyzedCorpus.csv
 
+## 这里是对ModelTrainer.exe的调用方法，参数分别是 包含样本路径与标签的CSV文件 和 训练步长, 最后保存权重
 ## Run the model traininer on that CSV. It will output a weight vector as one of its lines.
 ModelTrainer\ModelTrainer.exe C:\Users\lee\OneDrive\Documents\Revoke-Obfuscation\AnalyzedCorpus.csv 0.01 | Tee-Object -Variable Output
 $weights = ($output[-12] -split ' ' | ? { $_ } ) -join ', '
 
-
+## B. 实际网络上的脚本作为训练集合
 ## "In the wild"" version:
 $labeledData = @{}
 $bn = "c:\users\lee\corpus"
@@ -55,7 +61,8 @@ $weights = ($output[-12] -split ' ' | ? { $_ } ) -join ', '
 
 
 
-
+## ================= 通过文章中提到的字符余弦相似度进行混淆的判断 ====================
+## 安装方法 Install-Script -Name Measure-CharacterFrequency
 ## Seeing Measure-CharacterFrequency
 <#
 
